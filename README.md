@@ -1,2 +1,2 @@
-# ctrace-javascript
-Canonical OpenTracing 
+# Canonical OpenTracing Implementation for Javascript
+ 
