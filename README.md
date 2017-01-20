@@ -1,2 +1,2 @@
-# Canonical OpenTracing Implementation for Javascript
+# Canonical OpenTracing for Javascript
  
