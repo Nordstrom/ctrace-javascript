@@ -1,5 +1,6 @@
 # ctrace-js
-[![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[![Build Status](https://travis-ci.org/Nordstrom/ctrace-js.svg?branch=master)](https://travis-ci.org/Nordstrom/ctrace-js)[[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](http://standardjs.com/)
+
 ctrace-js is a Canonical [OpenTracing](http://opentracing.io/) implementation for Javascript.  It follows the [ctrace](https://github.com/Nordstrom/ctrace) specification.
 
 ## Why
