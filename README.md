@@ -1,4 +1,5 @@
 # ctrace-js
+[![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 ctrace-js is a Canonical [OpenTracing](http://opentracing.io/) implementation for Javascript.  It follows the [ctrace](https://github.com/Nordstrom/ctrace) specification.
 
 ## Why
@@ -94,7 +95,6 @@ The REST service might want to log the DB update as follows.
 If the REST service call completes successfully on the server, add tag for
 status and finish the span.
 
-```
 
 ```js
 app.post('/users', (req, res) => {
@@ -146,102 +146,136 @@ span.addTags({
 span.finish()
 ```
 
-```js
-// require and create a new Tracer
-const request = require('request-promise')
-const Tracer = require('ctrace')
-const tracer = new Tracer()
+## API
 
-// Start a new Span to track the call to downstream service.  This will trigger Start-Span Event.
-const span = tracer.startSpan('CreateUser', {
-  tags: {
-    'span.kind': 'client',
-    'component': 'UserAdapter',
-    'peer.hostname': 'my-registry.net',
-    'peer.port': '443',
-    'peer.service': 'UserRegistry',
-    'http.method': 'POST',
-    'http.url': 'https://my-registry.net/users?apikey=293283209'
-  }
-})
+* **[new Tracer (options)](#newtracer-options)**
+* **[tracer.startSpan (name, fields)](#tracerstartspan-name-fields)**
+* **[tracer.inject (spanContext, format, carrier)](#tracerinject-spancontext, format, carrier)**
+* **[tracer.extract (format, carrier)](#tracerextract-format-carrier)**
+* **[span.log (keyValues, [timestamp])](#spanlog-keyvalues--timestamp)**
+* **[span.addTags (keyValues)](#spanaddtags-keyvalues)**
+* **[span.finish ([timestamp])](#spanfinish--timestamp)**
 
-const opts = {
-  method: 'POST',
-  url: 'https://my-registry.net/users?apikey=293283209',
-  headers: {},
-  body: body,
-  json: true
-}
+### new Tracer (options)
+Create a new Tracer instance.  Ideally this should be done once for each application.
 
-tracer.inject(span, Tracer.FORMAT_HTTP_HEADERS, opts.headers)
-return request(opts)
-  .then(result => {
-    // Add 200 status code to span
-    span.addTags({'http.status_code': 200})
-    span.finish()
-    // More Business Logic here...
-  })
-  .catch(e => {
-    // Make sure you get the wrapped error
-    e = e.error || e
-    const statusCode = e.statusCode || 500
+#### options
+Type: `Object`
 
-    // Add error status code and error=true tags to span
-    span.addTags({
-      'http.status_code': statusCode,
-      'error': true,
-      'error_details': e.toString()
-    })
+##### options.stream
+Type: `WritableStream`  Default: `process.stdout`
 
-    // Finish the span.  This will trigger Finish-Span Event.
-    span.finish()
-    // More Business Logic here...
-  })
-```
+Output stream.  All tracing events are written to this stream.
 
-That downstream REST service may track its handling of that call as follows.
+##### options.debug
+Type: `bool`   Default: `false`
+
+If set to `true`, all span.log events that have a key/value debug=true will be written to output.  Otherwise,
+these logs will not be written.
+
+### tracer.startSpan (name, [fields])
+Starts and returns a new Span representing a logical unit of work.
+For example:
 
 ```js
-const url = require('url')
-const express = require('express')
-const app = express()
-const Tracer = require('ctrace')
-const tracer = new Tracer()
-
-app.post('/users', (req, res) => {
-  const context = tracer.extract(Tracer.FORMAT_HTTP_HEADERS, req.headers)
-  const span = tracer.startSpan('CreateUser', {
-    childOf: context,
-    tags: {
-      'span.kind': 'server',
-      'component': 'UserRegistryController',
-      'peer.ipv4': req.ip,
-      'http.method': req.method,
-      'http.url': req.url
-    }
-  })
-  // Do some more business logic...  If span logging is need in helper functions
-  // make sure to pass span as an argument to access span.log
-  ...
-
-  // It may log saving the user to the registry db like this.
-  span.log({event: 'SaveUser', userId: ...})
-
-  ...
-  // On Success, do the following to add status code tag and finish the span
-  res.status(200).json(result)
-  span.addTags({'http.status_code': 200})
-  span.finish()
-
-  ...
-  // On Error, do the following to add the status code tag, set error=true,
-  // log the error, and finish the span
-  res.status(500).json(error)
-  span.addTags({
-    'http.status_code': 500,
-    'error': true,
-    'error_details': error.toString()
-  })
-  span.finish()
-})
+// Start a new (parentless) root Span:
+const parent = tracer.startSpan('DoWork');
+// Start a new (child) Span:
+const child = tracer.startSpan('Subroutine',
+  childOf: parent,
+ });
 ```
+
+#### name
+Type: `string`
+
+The name of the operation.
+
+#### [fields]
+Type: `object`
+
+The fields to set on the newly created span.
+
+##### [fields.childOf]
+Type: `object`
+
+A parent SpanContext (or Span, for convenience) that the newly-started span
+will be the child of (per REFERENCE_CHILD_OF).
+
+##### [fields.tags]
+Type: `object`
+
+Set of key-value pairs which will be set
+as tags on the newly created Span. Ownership of the object is
+passed to the created span for efficiency reasons (the caller
+should not modify this object after calling startSpan).
+
+
+### tracer.inject (spanContext, format, carrier)
+Injects the given SpanContext instance for cross-process propagation
+within `carrier`. The expected type of `carrier` depends on the value of `format`.
+
+OpenTracing defines a common set of `format` values (see
+FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
+an expected carrier type.
+Consider this pseudocode example:
+
+```js
+const clientSpan = ...
+...
+// Inject clientSpan into a text carrier.
+const headersCarrier = {}
+tracer.inject(clientSpan.context(), Tracer.FORMAT_HTTP_HEADERS, headersCarrier)
+// Incorporate the textCarrier into the outbound HTTP request header
+// map.
+Object.assign(outboundHTTPReq.headers, headersCarrier)
+// ... send the httpReq
+```
+
+#### spanContext
+Type: `object`
+
+The SpanContext to inject into the
+carrier object. As a convenience, a Span instance may be passed
+in instead (in which case its .context() is used for the
+inject()).
+
+#### format
+Type: `string`
+
+The format of the carrier.
+
+#### carrier
+Type: `object`
+
+See the documentation for the chosen `format`
+for a description of the carrier object.
+
+### tracer.extract (format, carrier)
+Returns a SpanContext instance extracted from `carrier` in the given `format`.
+OpenTracing defines a common set of `format` values (see
+FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
+an expected carrier type.
+
+Consider this pseudocode example:
+```js
+ // Use the inbound HTTP request's headers as a text map carrier.
+ var headersCarrier = inboundHTTPReq.headers;
+ var wireCtx = tracer.extract(Tracer.FORMAT_HTTP_HEADERS, headersCarrie)
+ var serverSpan = tracer.startSpan('...', { childOf : wireCtx })
+ ```
+
+#### format
+Type: `string`
+
+The format of the carrier.
+
+#### carrier
+Type: `object`
+The type of the carrier object is determined by the format.
+
+### span.log (keyValues, [timestamp])
+
+### span.addTags (keyValues)
+
+### span.finish([timestamp])
