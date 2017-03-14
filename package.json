@@ -4,7 +4,7 @@
   "description": "Canonical OpenTracing for Javascript",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "standard | snazzy && mocha",
     "bench": "node demo/bench.js"
   },
   "author": "@andyday",
@@ -27,10 +27,11 @@
       "describe",
       "it",
       "before",
-      "beforeEach"
+      "beforeEach",
+      "afterEach"
     ]
   },
   "dependencies": {
-    "opentracing": "https://github.com/opentracing/opentracing-javascript.git"
+    "opentracing": "^0.13.0"
   }
 }

@@ -63,4 +63,31 @@ describe('child span', () => {
       log: {event: 'Start-Span', timestamp: logTime}
     })
   })
+
+  it('should start with tags', () => {
+    tracer.startSpan('child-childWithTags', {
+      childOf: parent,
+      tags: {
+        'component': 'SpanTag'
+      }
+    })
+    const rec = parse(buf[1])
+    const spanId = rec.spanId
+    const startTime = rec.start
+    const logTime = rec.log.timestamp
+
+    startTime.should.be.aboveOrEqual(timestamp)
+    logTime.should.be.aboveOrEqual(startTime)
+
+    buf.should.have.length(2)
+    rec.should.eql({
+      traceId: traceId,
+      parentId: parentId,
+      spanId: spanId,
+      operation: 'child-childWithTags',
+      start: startTime,
+      tags: { component: 'SpanTag' },
+      log: { event: 'Start-Span', timestamp: logTime }
+    })
+  })
 })
