@@ -138,9 +138,9 @@ describe('tracer', () => {
 
       rec.traceId.should.equal(fields.traceId)
       rec.spanId.should.equal(fields.spanId)
-      rec.start.should.equal(fields.start * 1000)
+      rec.start.should.equal(fields.start)
       rec.operation.should.equal('originating')
-      rec.logs[0].timestamp.should.equal(fields.logs[0].timestamp * 1000)
+      rec.logs[0].timestamp.should.equal(fields.logs[0].timestamp)
       rec.logs[0].event.should.equal('Start-Span')
     })
 

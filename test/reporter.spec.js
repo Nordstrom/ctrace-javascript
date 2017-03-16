@@ -35,10 +35,10 @@ describe('reporter', () => {
 
     buf[0].should.equal(
       '{"traceId":"abc","spanId":"def","parentId":"ghi","operation":"op1",' +
-      '"start":1489522409134000,"duration":123,' +
+      '"start":1489522409134,"duration":123,' +
       '"tags":{"tag1":"val1","tag2":"val2"},' +
-      '"logs":[{"timestamp":1489522409134000,"event":"Start-Span"},' +
-      '{"timestamp":1489522409135000,"event":"Finish-Span"}]}'
+      '"logs":[{"timestamp":1489522409134,"event":"Start-Span"},' +
+      '{"timestamp":1489522409135,"event":"Finish-Span"}]}'
     )
   })
 })

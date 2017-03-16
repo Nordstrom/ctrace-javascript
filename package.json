@@ -6,7 +6,7 @@
   "scripts": {
     "test": "snazzy && nyc --reporter=lcov --reporter=text mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "bench": "node demo/bench.js"
+    "bench": "node ./bench.js"
   },
   "author": "@andyday",
   "license": "Apache-2.0",

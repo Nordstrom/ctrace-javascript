@@ -1,24 +1,89 @@
+'use strict'
+
 const fs = require('fs')
+const opentracing = require('opentracing')
 const Benchmark = require('benchmark')
 const suite = new Benchmark.Suite()
-const uuid = require('uuid/v4')
 const pino = require('pino')
-const AvroWriter = require('../lib/writers/avro.js')
-const MsgpackWriter = require('../lib/writers/msgpack.js')
+const Tracer = require('./')
 const logger = pino(fs.createWriteStream('dump-pino.json'))
+const tracer = opentracing.globalTracer()
 
-const Tracer = require('../')
-const avroTracer = new Tracer({writer: new AvroWriter(fs.createWriteStream('dump.avro'))})
-const msgTracer = new Tracer({writer: new MsgpackWriter(fs.createWriteStream('dump.mp'))})
-const jsonTracer = new Tracer({stream: fs.createWriteStream('dump.json')})
+opentracing.initGlobalTracer(new Tracer({stream: fs.createWriteStream('dump.json')}))
 
-suite.add('avro', () => { bench(avroTracer) })
-suite.add('msgpack', () => { bench(msgTracer) })
-suite.add('json', () => { bench(jsonTracer) })
-suite.add('pino-logger', () => { benchLogger(logger) })
+suite.add('parent-child-log', () => {
+  const span = tracer.startSpan('parent', {
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    }
+  })
 
-function benchLogger (logger) {
-  const traceId = uuid()
+  const child = tracer.startSpan('child', {
+    childOf: span,
+    tags: {
+      'span.kind': 'server',
+      'component': 'child-component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    }
+  })
+
+  child.log({event: 'child-event'})
+  child.finish()
+  span.finish()
+})
+
+suite.add('parent', () => {
+  const span = tracer.startSpan('parent', {
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    }
+  })
+  span.finish()
+})
+
+suite.add('parent-child', () => {
+  const span = tracer.startSpan('parent', {
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    }
+  })
+
+  const child = tracer.startSpan('child', {
+    childOf: span,
+    tags: {
+      'span.kind': 'server',
+      'component': 'child-component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    }
+  })
+
+  child.finish()
+  span.finish()
+})
+
+suite.add('pino-parent-child-log', () => {
+  const traceId = Tracer.genId()
   logger.info({
     traceId: traceId,
     spanId: traceId,
@@ -93,11 +158,14 @@ function benchLogger (logger) {
     },
     log: {event: 'Finish-Span', timestamp: Date.now()}
   })
-}
+})
 
-function bench (tracer) {
-  // console.log('bench')
-  const span = tracer.startSpan('parent', {
+suite.add('pino-parent', () => {
+  const traceId = Tracer.genId()
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'parent',
     tags: {
       'span.kind': 'server',
       'component': 'component',
@@ -105,30 +173,91 @@ function bench (tracer) {
       'peer.ipv6': 'ip',
       'http.method': 'method',
       'http.url': 'https://some.url.outthere.com'
-    }
+    },
+    log: {event: 'Start-Span', timestamp: Date.now()}
   })
 
-  const child = tracer.startSpan('child', {
-    childOf: span,
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'parent',
     tags: {
       'span.kind': 'server',
-      'component': 'child-component',
+      'component': 'component',
       'peer.hostname': 'hostname',
       'peer.ipv6': 'ip',
       'http.method': 'method',
       'http.url': 'https://some.url.outthere.com'
-    }
+    },
+    log: {event: 'Finish-Span', timestamp: Date.now()}
+  })
+})
+
+suite.add('pino-parent-child', () => {
+  const traceId = Tracer.genId()
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'parent',
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    },
+    log: {event: 'Start-Span', timestamp: Date.now()}
   })
 
-  child.log({event: 'child-event'})
-  child.finish()
-  span.finish()
-}
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'child',
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    },
+    log: {event: 'Start-Span', timestamp: Date.now()}
+  })
 
-bench(avroTracer)
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'child',
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    },
+    log: {event: 'Finish-Span', timestamp: Date.now()}
+  })
+
+  logger.info({
+    traceId: traceId,
+    spanId: traceId,
+    operation: 'parent',
+    tags: {
+      'span.kind': 'server',
+      'component': 'component',
+      'peer.hostname': 'hostname',
+      'peer.ipv6': 'ip',
+      'http.method': 'method',
+      'http.url': 'https://some.url.outthere.com'
+    },
+    log: {event: 'Finish-Span', timestamp: Date.now()}
+  })
+})
 
 suite.on('cycle', (e) => {
-  console.log(String(e.target))
+  console.log(String(e.target), 1000000000 / e.target.hz, 'nanos/op')
 })
 
 suite.on('complete', (e) => {
