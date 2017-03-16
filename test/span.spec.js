@@ -6,7 +6,7 @@ const opentracing = require('opentracing')
 const Tracer = require('../')
 const Stream = require('./util/stream.js')
 
-describe.only('span', () => {
+describe('span', () => {
   let stream, buf, tracer, timestamp, parent, child
 
   beforeEach(() => {
