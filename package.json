@@ -4,7 +4,7 @@
   "description": "Canonical OpenTracing for Javascript",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text mocha",
+    "test": "snazzy && nyc --reporter=lcov --reporter=text mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "bench": "node demo/bench.js"
   },

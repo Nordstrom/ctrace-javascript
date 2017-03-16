@@ -122,5 +122,13 @@ describe('span', () => {
       rec.logs[0].timestamp.should.equal(fields.logs[0].timestamp * 1000)
       rec.logs[0].event.should.equal('my-event')
     })
+
+    it('should finish', () => {
+      parent.finish()
+      let fields = parent._fields
+      fields.duration.should.be.aboveOrEqual(0)
+      fields.logs[0].timestamp.should.be.aboveOrEqual(timestamp)
+      fields.logs[0].event.should.equal('Finish-Span')
+    })
   })
 })
