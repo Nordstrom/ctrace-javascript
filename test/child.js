@@ -6,7 +6,7 @@ const Tracer = require('../')
 const Stream = require('./util/stream.js')
 const parse = JSON.parse
 
-describe('child span', () => {
+describe.skip('child span', () => {
   let stream, buf, tracer, timestamp, parent, traceId, parentId
 
   beforeEach(() => {

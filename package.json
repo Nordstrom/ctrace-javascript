@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
+    "cover": "nyc --reporter=lcov --reporter=text mocha",
     "bench": "node demo/bench.js"
   },
   "author": "@andyday",
@@ -14,6 +15,7 @@
     "express": "^4.14.0",
     "fast-json-parse": "^1.0.2",
     "mocha": "^3.2.0",
+    "nyc": "^10.1.2",
     "pino": "^3.1.1",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
@@ -31,6 +33,6 @@
     ]
   },
   "dependencies": {
-    "opentracing": "https://github.com/opentracing/opentracing-javascript.git"
+    "opentracing": "^0.13.0"
   }
 }
