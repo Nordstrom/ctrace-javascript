@@ -3,4 +3,6 @@ node_js:
   - "7"
   - "6"
   - "4.3"
-after_success: npm run coverage
+after_success:
+  - npm run coverage
+  - npm run bench
