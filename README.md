@@ -1,5 +1,5 @@
 # ctrace-js
-[![Build Status][ci-img]][ci] [![Report Card][rep-img]][rep] [![Coverage Status][cov-img]][cov] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
+[![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
 
 [Canonical OpenTracing](https://github.com/Nordstrom/ctrace) for Javascript
 
