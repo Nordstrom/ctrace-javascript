@@ -1,8 +1,7 @@
 # ctrace-js
-[![Build Status](https://travis-ci.org/Nordstrom/ctrace-js.svg?branch=new)](https://travis-ci.org/Nordstrom/ctrace-js)
-[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](http://standardjs.com/)
+[![Build Status][ci-img]][ci] [![Report Card][rep-img]][rep] [![Coverage Status][cov-img]][cov] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
 
-Canonical [OpenTracing](http://opentracing.io/) for Javascript.  It follows the [ctrace](https://github.com/Nordstrom/ctrace/tree/new) specification.
+[Canonical OpenTracing](https://github.com/Nordstrom/ctrace) for Javascript
 
 > Currently this only supports Node.js usage.  Browser-based Javascript support will be added later.
 
@@ -362,3 +361,10 @@ Optional finish time in milliseconds as a Unix timestamp. Decimal
 values are supported for timestamps with sub-millisecond accuracy.
 If not specified, the current time (as defined by the
 implementation) will be used.
+
+[ci-img]: https://travis-ci.org/Nordstrom/ctrace-js.svg?branch=new
+[ci]: https://travis-ci.org/Nordstrom/ctrace-js
+[cov-img]: https://coveralls.io/repos/github/Nordstrom/ctrace-js/badge.svg?branch=new
+[cov]: https://coveralls.io/github/Nordstrom/ctrace-js?branch=new
+[ot-img]: https://img.shields.io/badge/OpenTracing--1.0-enabled-blue.svg
+[ot-url]: http://opentracing.io
