@@ -30,7 +30,8 @@
       "describe",
       "it",
       "before",
-      "beforeEach"
+      "beforeEach",
+      "afterEach"
     ]
   },
   "dependencies": {
