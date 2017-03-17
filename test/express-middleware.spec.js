@@ -43,15 +43,8 @@ describe('express middleware', () => {
 
     // always responds with error route
     app.get('/err', (req, res) => {
-      try {
-        alwaysThrows()
-      } catch (e) {
-        setTimeout(function () {
-          res.status(500).send({data: 'this is an error!'})
-        }, 5)
-      }
+      res.status(500).send({data: 'this is an error!'})
     })
-    function alwaysThrows () { throw new Error('Error from endpoint /err') }
 
     server = app.listen(0, () => {
       port = server.address().port
@@ -86,7 +79,6 @@ describe('express middleware', () => {
       })
       it('should have request-based middleware span tags', () => {
         let record = stream.getJSON(0)
-        record.should.have.tag('peer.hostname', '127.0.0.1')
         record.should.have.tag('http.remote_addr', '::ffff:127.0.0.1')
         record.should.have.tag('http.method', 'GET')
         record.should.have.tag('http.url', `${url}/hi`)
@@ -97,15 +89,16 @@ describe('express middleware', () => {
         return request({method: 'GET', url: `${url}/hi`})
       })
       it('should assign the name to be in format "[method]-[url]"', () => {
-        stream.getJSON(0).should.have.property('operation', 'GET-/hi')
+        stream.getJSON(0).should.have.property('operation', 'GET:/hi')
       })
 
       it('should start span and assign to property `span` of request', () => {
         should.exist(incomingReq)
-        incomingReq.should.have.property('span').and.be.an.instanceOf(Span)
+        incomingReq.should.have.property('traceContext').which.is.an.Object()
+        incomingReq.traceContext.should.have.property('span').which.is.an.instanceOf(Span)
 
         const rec = stream.getJSON(0)
-        let spanContext = incomingReq.span.context()
+        let spanContext = incomingReq.traceContext.span.context()
         spanContext.should.containEql({
           'traceId': rec.traceId,
           'spanId': rec.spanId
@@ -181,7 +174,7 @@ describe('express middleware', () => {
     // mock app server setup
     beforeEach((done) => {
       app = express()
-      app.use(Tracer.express({nameBuilder: customNameBuilder}))
+      app.use(Tracer.express({operationNameBuilder: customNameBuilder}))
 
       startServer(done)
     })
