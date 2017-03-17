@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "snazzy && nyc --reporter=lcov --reporter=text mocha",
+    "qa": "mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "bench": "node ./bench.js"
   },
@@ -30,7 +31,9 @@
       "describe",
       "it",
       "before",
-      "beforeEach"
+      "beforeEach",
+      "after",
+      "afterEach"
     ]
   },
   "dependencies": {
