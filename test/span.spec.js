@@ -55,6 +55,18 @@ describe('span', () => {
       buf.should.be.empty()
     })
 
+    it('should log with timestamp', () => {
+      parent.log({}, 1489522409134)
+      let fields = parent._fields
+      fields.logs[1].timestamp.should.equal(1489522409134000)
+    })
+
+    it('should log with timestamp key/value', () => {
+      parent.log({timestamp: 1489522409134})
+      let fields = parent._fields
+      fields.logs[1].timestamp.should.equal(1489522409134000)
+    })
+
     it('should set tag', () => {
       parent.setTag('tag1', 'val1')
       parent._fields.tags.tag1.should.equal('val1')

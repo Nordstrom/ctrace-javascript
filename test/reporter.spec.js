@@ -41,4 +41,9 @@ describe('reporter', () => {
       '{"timestamp":1489522409135,"event":"Finish-Span"}]}'
     )
   })
+
+  it('should report to stdout by default', () => {
+    // This only tests that defaulting to stdout does not produce an error
+    new Reporter({encode: () => { return '' }}).report()
+  })
 })
