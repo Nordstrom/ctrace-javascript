@@ -36,7 +36,30 @@ opentracing.initGlobalTracer(new Tracer())
 ```
 
 ### Client HTTP Requests
-> TBD
+To trace client HTTP requests you can use the `request` wrapper for [request-promise](https://www.npmjs.com/package/request-promise) or [request](https://www.npmjs.com/package/request).  To trace a request using [request-promise](https://www.npmjs.com/package/request-promise) make sure it is
+installed and then initialize the `request` wrapper in a main module follows.
+
+```js
+const request = require('ctrace').request
+const request.init(require('request-promise'))
+```
+
+You can then send HTTP(S) requests in this or other modules as follows.
+
+```js
+const request = require('ctrace').request
+
+function send(span, uri, body) {
+  return request({
+    method: 'POST',
+    uri: uri,
+    body: body,
+    traceContext: {
+      span: span   // Current opentracing span
+    }
+  })
+}
+```
 
 ### Use Express Middleware for server spans
 Add the Express Middleware as follows to trace HTTP REST server calls.
