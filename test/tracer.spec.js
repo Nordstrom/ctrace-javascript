@@ -62,10 +62,10 @@ describe('tracer', () => {
       }
       tracer.inject(ctx, opentracing.FORMAT_HTTP_HEADERS, headers)
       headers.should.eql({
-        'Ct-Trace-Id': 'abc',
-        'Ct-Span-Id': 'def',
-        'Ct-Bag-bag1': 'val1',
-        'Ct-Bag-bag-n2': 'val2'
+        'ct-trace-id': 'abc',
+        'ct-span-id': 'def',
+        'ct-bag-bag1': 'val1',
+        'ct-bag-bag-n2': 'val2'
       })
     })
 
@@ -90,10 +90,10 @@ describe('tracer', () => {
 
     it('should extract headers', () => {
       const headers = {
-        'Ct-Trace-Id': 'abc',
-        'Ct-Span-Id': 'def',
-        'Ct-Bag-bag1': 'val1',
-        'Ct-Bag-bag-n2': 'val2'
+        'ct-trace-id': 'abc',
+        'ct-span-id': 'def',
+        'ct-bag-bag1': 'val1',
+        'ct-bag-bag-n2': 'val2'
       }
       const ctx = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, headers)
       ctx.should.eql({
