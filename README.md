@@ -198,7 +198,7 @@ span.finish()
 
 ## API
 
-* **[new Tracer (options)](#new-tracer-options)**
+* **[tracer.init (options)](#tracerinit-options)**
 * **[tracer.startSpan (name, fields)](#tracerstartspan-name-fields)**
 * **[tracer.inject (spanContext, format, carrier)](#tracerinject-spancontext-format-carrier)**
 * **[tracer.extract (format, carrier)](#tracerextract-format-carrier)**
@@ -206,7 +206,7 @@ span.finish()
 * **[span.addTags (keyValues)](#spanaddtags-keyvalues)**
 * **[span.finish ([timestamp])](#spanfinish--timestamp)**
 
-### new Tracer (options)
+### tracer.init (options)
 Create a new Tracer instance.  Ideally this should be done once for each application.
 
 #### options
