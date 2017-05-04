@@ -5,10 +5,9 @@ const urlParse = require('url').parse
 const http = require('http')
 const rp = require('request-promise')
 const request = require('request')
-const opentracing = require('opentracing')
 const Stream = require('./util/stream.js')
-const Tracer = require('../')
-const tr = Tracer.request
+const tracer = require('../')
+const tr = tracer.request
 
 function createServer () {
   let s = http.createServer(function (req, res) {
@@ -47,7 +46,7 @@ function createServer () {
 }
 
 describe('request', () => {
-  let s, buf, timestamp, tracer
+  let s, buf, timestamp
 
   before((done) => {
     s = createServer()
@@ -60,8 +59,7 @@ describe('request', () => {
     let stream = new Stream()
     buf = stream.buf
     tr.init(rp)
-    opentracing.initGlobalTracer(new Tracer({stream}))
-    tracer = opentracing.globalTracer()
+    tracer.init({stream})
     timestamp = Date.now() * 1000
   })
 

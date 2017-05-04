@@ -3,11 +3,11 @@
 require('should')
 
 const opentracing = require('opentracing')
-const Tracer = require('../')
+const tracer = require('../')
 const Stream = require('./util/stream.js')
 
 describe('tracer', () => {
-  let stream, buf, tracer, timestamp
+  let stream, buf, timestamp
 
   beforeEach(() => {
     stream = new Stream()
@@ -17,8 +17,7 @@ describe('tracer', () => {
 
   describe('with single-event mode', () => {
     beforeEach(() => {
-      opentracing.initGlobalTracer(new Tracer({stream}))
-      tracer = opentracing.globalTracer()
+      tracer.init({stream})
     })
 
     it('should start originating span', () => {
@@ -127,8 +126,7 @@ describe('tracer', () => {
 
   describe('with multi-event mode', () => {
     beforeEach(() => {
-      opentracing.initGlobalTracer(new Tracer({stream, multiEvent: true}))
-      tracer = opentracing.globalTracer()
+      tracer.init({stream, multiEvent: true})
     })
 
     it('should output started originating span', () => {

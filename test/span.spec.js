@@ -2,12 +2,11 @@
 
 require('should')
 
-const opentracing = require('opentracing')
-const Tracer = require('../')
+const tracer = require('../')
 const Stream = require('./util/stream.js')
 
 describe('span', () => {
-  let stream, buf, tracer, timestamp, parent, child
+  let stream, buf, timestamp, parent, child
 
   beforeEach(() => {
     stream = new Stream()
@@ -17,14 +16,13 @@ describe('span', () => {
 
   describe('with single-event mode', () => {
     beforeEach(() => {
-      tracer = new Tracer({stream})
-      opentracing.initGlobalTracer(tracer)
-      parent = opentracing.globalTracer().startSpan('parent')
-      child = opentracing.globalTracer().startSpan('child', {childOf: parent})
+      tracer.init({stream})
+      parent = tracer.startSpan('parent')
+      child = tracer.startSpan('child', {childOf: parent})
     })
 
     it('should return tracer', () => {
-      parent.tracer().should.equal(tracer)
+      JSON.stringify(parent.tracer()).should.match(/_propagation/)
     })
 
     it('should return context', () => {
@@ -118,8 +116,7 @@ describe('span', () => {
 
   describe('with multi-event mode', () => {
     beforeEach(() => {
-      opentracing.initGlobalTracer(new Tracer({stream, multiEvent: true}))
-      tracer = opentracing.globalTracer()
+      tracer.init({stream, multiEvent: true})
       parent = tracer.startSpan('parent')
     })
 

@@ -28,11 +28,7 @@ Add instrumentation to the operations you want to track. This is composed primar
 First, initialize global tracer as follows.
 
 ```js
-const opentracing = require('opentracing')
-const Tracer = require('ctrace')
-const tracer = opentracing.globalTracer()
-
-opentracing.initGlobalTracer(new Tracer())
+const tracer = require('ctrace')
 ```
 
 ### Client HTTP Requests
@@ -66,10 +62,10 @@ Add the Express Middleware as follows to trace HTTP REST server calls.
 
 ```js
 const express = require('express')
-const Tracer = require('ctrace')
+const tracer = require('ctrace')
 const app = express()
 
-app.use(Tracer.express)
+app.use(tracer.express)
 
 app.post('/users', (req, res) => {
   ...

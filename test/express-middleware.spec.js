@@ -3,7 +3,7 @@
 require('./util/assertions')
 const should = require('should')
 
-const Tracer = require('../')
+const tracer = require('../')
 const Span = require('../lib/span.js')
 const Stream = require('./util/stream.js')
 
@@ -13,14 +13,12 @@ describe('express middleware', () => {
   const express = require('express')
   const request = require('request-promise')
 
-  let stream, tracer
+  let stream
 
   // global open tracing setup
   beforeEach(() => {
-    const opentracing = require('opentracing')
     stream = new Stream()
-    tracer = new Tracer({stream})
-    opentracing.initGlobalTracer(tracer)
+    tracer.init({stream})
   })
 
   // server vars
@@ -62,7 +60,7 @@ describe('express middleware', () => {
     // mock app server setup
     beforeEach((done) => {
       app = express()
-      app.use(Tracer.express())
+      app.use(tracer.express())
 
       // start up app server with routes /hi and /err
       startServer(done)
@@ -174,7 +172,7 @@ describe('express middleware', () => {
     // mock app server setup
     beforeEach((done) => {
       app = express()
-      app.use(Tracer.express({operationNameBuilder: customNameBuilder}))
+      app.use(tracer.express({operationNameBuilder: customNameBuilder}))
 
       startServer(done)
     })
