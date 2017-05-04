@@ -380,6 +380,15 @@ values are supported for timestamps with sub-millisecond accuracy.
 If not specified, the current time (as defined by the
 implementation) will be used.
 
+## Roadmap
+- [x] Core Start, Log, and Finish Span
+- [x] Inject, Extract to Text and Header formats
+- [ ] Inject, Extract to Binary format
+- [x] Express Middleware support
+- [x] Request and Request-Promise interceptor support
+- [ ] Kinesis, Lambda and Plain Lambda wrapper support
+- [ ] API Gateway / Lambda in Proxy Mode support
+
 [ci-img]: https://travis-ci.org/Nordstrom/ctrace-js.svg?branch=new
 [ci]: https://travis-ci.org/Nordstrom/ctrace-js
 [cov-img]: https://coveralls.io/repos/github/Nordstrom/ctrace-js/badge.svg?branch=new
