@@ -120,11 +120,10 @@ The called REST service can start a server Span as follows.
 ```js
 const express = require('express')
 const app = express()
-const Tracer = require('ctrace')
-const tracer = new Tracer()
+const tracer = require('ctrace')
 
 app.post('/users', (req, res) => {
-  const context = tracer.extract(Tracer.FORMAT_HTTP_HEADERS, req.headers)
+  const context = tracer.extract(tracer.FORMAT_HTTP_HEADERS, req.headers)
   const span = tracer.startSpan('RegisterUser', {
     childOf: context,  // include parent context
     // Standard Tags
