@@ -8,7 +8,8 @@
     "test": "mocha",
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
     "coveralls": "nyc --reporter=text-lcov mocha | coveralls",
-    "bench": "node ./bench.js"
+    "bench": "node ./bench.js",
+    "start": "node ./demo.js"
   },
   "author": "@andyday",
   "license": "Apache-2.0",
