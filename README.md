@@ -1,24 +1,24 @@
 # ctrace-js
 [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
 
-[Canonical OpenTracing](https://github.com/Nordstrom/ctrace) for Javascript
+[Canonical OpenTracing](https://github.com/Nordstrom/ctrace-js) for Javascript
 
 > Currently this only supports Node.js usage.  Browser-based Javascript support will be added later.
 
 ## Why
-[OpenTracing](http://opentracing.io) is a young specification and for most (if not all) SDK implementations, output format and wire protocol are specific to the backend platform implementation.  ctrace attempts to decouple the format and wire protocol from the backend tracer implementation.
+[OpenTracing](http://opentracing.io) is a young specification and for most (if not all) SDK implementations, output format and wire protocol are specific to the backend platform implementation.  ctrace-js attempts to decouple the format and wire protocol from the backend tracer implementation.
 
 ## What
-ctrace specifies a canonical format for trace logs.  By default the logs are output to stdout but you can configure them to go to any WritableStream.
+ctrace-js specifies a canonical format for trace logs.  By default the logs are output to stdout but you can configure them to go to any WritableStream.
 
 ## Required Reading
-To fully understand this platform API, it's helpful to be familiar with the [OpenTracing project](http://opentracing.io) project, [terminology](http://opentracing.io/documentation/pages/spec.html), and [ctrace specification](https://github.com/Nordstrom/ctrace/tree/new) more specifically.
+To fully understand this platform API, it's helpful to be familiar with the [OpenTracing project](http://opentracing.io) project, [terminology](http://opentracing.io/documentation/pages/spec.html), and [ctrace-js specification](https://github.com/Nordstrom/ctrace-js/tree/new) more specifically.
 
 ## Install
 Install via npm as follows:
 
 ```
-$ npm install ctrace --save
+$ npm install ctrace-js --save
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ Add instrumentation to the operations you want to track. This is composed primar
 First, initialize global tracer as follows.
 
 ```js
-const tracer = require('ctrace')
+const tracer = require('ctrace-js')
 ```
 
 ### Client HTTP Requests
@@ -36,14 +36,14 @@ To trace client HTTP requests you can use the `request` wrapper for [request-pro
 installed and then initialize the `request` wrapper in a main module follows.
 
 ```js
-const request = require('ctrace').request
+const request = require('ctrace-js').request
 const request.init(require('request-promise'))
 ```
 
 You can then send HTTP(S) requests in this or other modules as follows.
 
 ```js
-const request = require('ctrace').request
+const request = require('ctrace-js').request
 
 function send(span, uri, body) {
   return request({
@@ -62,7 +62,7 @@ Add the Express Middleware as follows to trace HTTP REST server calls.
 
 ```js
 const express = require('express')
-const tracer = require('ctrace')
+const tracer = require('ctrace-js')
 const app = express()
 
 app.use(tracer.express)
@@ -120,7 +120,7 @@ The called REST service can start a server Span as follows.
 ```js
 const express = require('express')
 const app = express()
-const tracer = require('ctrace')
+const tracer = require('ctrace-js')
 
 app.post('/users', (req, res) => {
   const context = tracer.extract(tracer.FORMAT_HTTP_HEADERS, req.headers)
