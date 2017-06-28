@@ -121,7 +121,7 @@ describe('tracer', () => {
     })
   })
 
-  describe('with log levels', () => {
+  describe.only('with log levels', () => {
 
     function createEvents (logLevel) {
       tracer.init({ stream, logLevel: logLevel })
@@ -150,6 +150,14 @@ describe('tracer', () => {
         error: errorEvent
       }
     }
+
+    it('defaults to info level when logLevel is not set', () => {
+      let events = createEvents()
+      events.debug.should.be.an.Object().and.be.empty()
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
 
     it('should log all events when logLevel is set to debug', () => {
       let events = createEvents('debug')
