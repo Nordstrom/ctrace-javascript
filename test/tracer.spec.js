@@ -121,7 +121,7 @@ describe('tracer', () => {
     })
   })
 
-  describe.only('with log levels', () => {
+  describe('with log levels', () => {
 
     function createEvents (logLevel) {
       tracer.init({ stream, logLevel: logLevel })
