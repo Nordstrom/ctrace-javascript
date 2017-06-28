@@ -1,5 +1,12 @@
 import opentracing from 'opentracing'
 
+const logLevels = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3
+}
+
 /**
  * Span represents a logical unit of work as part of a broader Trace. Examples
  * of span might include remote procedure calls or a in-process function calls
@@ -165,6 +172,14 @@ export default class Span extends opentracing.Span {
    * @return {Span} this
    */
   log (keyValues, timestamp) {
+    let self = this
+
+    const tracerLogLevel = logLevels[self._tracer._logLevel]
+    const eventLogLevel = logLevels[keyValues.level]
+    if (tracerLogLevel > eventLogLevel) {
+      return
+    }
+
     if (!timestamp) timestamp = keyValues.timestamp || Date.now()
     timestamp *= 1000
     keyValues.timestamp = timestamp

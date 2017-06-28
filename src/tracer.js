@@ -33,6 +33,7 @@ export default class Tracer {
    * @param {object.<string, Propagators>} [options.propagators] - optional propagators
    */
   constructor (options = {}) {
+    this._logLevel = options.logLevel || 'info'
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || false
