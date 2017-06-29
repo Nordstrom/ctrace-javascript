@@ -152,7 +152,7 @@ describe('tracer', () => {
       }
     }
 
-    it('does not output any logs when tracer debug is false but span debug is true', () => {
+    it('does not output any logs when tracer.debug is false but span.debug is true', () => {
       let events = createEvents(false, true)
       events.debug.should.be.an.Object().and.be.empty()
       events.info.should.be.an.Object().and.be.empty()
@@ -160,7 +160,8 @@ describe('tracer', () => {
       events.error.should.be.an.Object().and.be.empty()
     })
 
-    it('defaults to debug false when debug is not set and does not log debug, info or warn events', () => {
+    it('defaults to debug false when tracer.debug is not set and does not log debug, info or warn events', () => {
+      // should still log error because span.debug is false
       let events = createEvents()
       events.debug.should.be.an.Object().and.be.empty()
       events.info.should.be.an.Object().and.be.empty()
@@ -168,8 +169,16 @@ describe('tracer', () => {
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it('should log all events when debug is true', () => {
+    it('should only log error events when tracer.debug is true and span.debug is false', () => {
       let events = createEvents(true)
+      events.debug.should.be.an.Object().and.be.empty()
+      events.info.should.be.an.Object().and.be.empty()
+      events.warn.should.be.an.Object().and.be.empty()
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
+
+    it('should log all events when tracer.debug and span.debug are both true', () => {
+      let events = createEvents(true, true)
       events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
       events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
       events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
@@ -177,7 +186,7 @@ describe('tracer', () => {
 
     })
 
-    it('should not log debug, info or warn events when debug is false', () => {
+    it('should not log debug, info or warn events when tracer.debug is false', () => {
       let events = createEvents(false)
       events.debug.should.be.an.Object().and.be.empty()
       events.info.should.be.an.Object().and.be.empty()
