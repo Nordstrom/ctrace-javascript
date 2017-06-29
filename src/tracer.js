@@ -33,7 +33,6 @@ export default class Tracer {
    * @param {object.<string, Propagators>} [options.propagators] - optional propagators
    */
   constructor (options = {}) {
-    this._logLevel = options.logLevel || 'info'
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || false
@@ -84,7 +83,6 @@ export default class Tracer {
    */
   startSpan (name, options = {}) {
     const now = Date.now() * 1000
-
     let ref = (options.childOf && options.childOf._fields) || options.childOf
 
     const spanId = genId()
@@ -121,6 +119,7 @@ export default class Tracer {
       }
     }
 
+    f.debug = options.debug || false
     f.operation = name
     f.start = now
 

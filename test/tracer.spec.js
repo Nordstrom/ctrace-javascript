@@ -121,11 +121,12 @@ describe('tracer', () => {
     })
   })
 
-  describe('with log levels', () => {
+  describe('with debug settings', () => {
 
-    function createEvents (logLevel) {
-      tracer.init({ stream, logLevel: logLevel })
-      let ctx = { span: tracer.startSpan('originating', () => {}) }
+    function createEvents (isTracerDebug, isSpanDebug) {
+      tracer.init({ stream, debug: isTracerDebug })
+      let span = tracer.startSpan('originating', { debug: isSpanDebug }, () => {})
+      let ctx = { span:  span }
       tracer.debug(ctx, 'DebugEvent', { foo: 'bar' })
       tracer.info(ctx, 'InfoEvent', { foo: 'bar' })
       tracer.warn(ctx, 'WarnEvent', { foo: 'bar' })
@@ -151,16 +152,24 @@ describe('tracer', () => {
       }
     }
 
-    it('defaults to info level when logLevel is not set', () => {
+    it('does not output any logs when tracer debug is false but span debug is true', () => {
+      let events = createEvents(false, true)
+      events.debug.should.be.an.Object().and.be.empty()
+      events.info.should.be.an.Object().and.be.empty()
+      events.warn.should.be.an.Object().and.be.empty()
+      events.error.should.be.an.Object().and.be.empty()
+    })
+
+    it('defaults to debug false when debug is not set and does not log debug, info or warn events', () => {
       let events = createEvents()
       events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
-      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.info.should.be.an.Object().and.be.empty()
+      events.warn.should.be.an.Object().and.be.empty()
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it('should log all events when logLevel is set to debug', () => {
-      let events = createEvents('debug')
+    it('should log all events when debug is true', () => {
+      let events = createEvents(true)
       events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
       events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
       events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
@@ -168,26 +177,8 @@ describe('tracer', () => {
 
     })
 
-    it('should not log debug events when logLevel is set to info', () => {
-      let events = createEvents('info')
-      events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
-      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
-      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
-
-    })
-
-    it('should not log debug or info events when logLevel is set to warn', () => {
-      let events = createEvents('warn')
-      events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.be.an.Object().and.be.empty()
-      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
-      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
-
-    })
-
-    it('should not log debug, info or warn events when logLevel is set to error', () => {
-      let events = createEvents('error')
+    it('should not log debug, info or warn events when debug is false', () => {
+      let events = createEvents(false)
       events.debug.should.be.an.Object().and.be.empty()
       events.info.should.be.an.Object().and.be.empty()
       events.warn.should.be.an.Object().and.be.empty()
