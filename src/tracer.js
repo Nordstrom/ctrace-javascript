@@ -209,6 +209,10 @@ export default class Tracer {
   }
 
   report (fields) {
+    // if tracer.debug is false and span.debug is true, don't log this event
+    if (!this.debug && fields.debug) {
+      return
+    }
     return this._reporter.report(fields)
   }
 

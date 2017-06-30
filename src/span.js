@@ -166,10 +166,7 @@ export default class Span extends opentracing.Span {
    * @return {Span} this
    */
   log (keyValues, timestamp) {
-    const eventLogLevel = keyValues.level
-
-    if (((!this._tracer.debug || !this.debug) && (eventLogLevel === 'debug' || eventLogLevel === 'info' || eventLogLevel === 'warn')) ||
-      (this.debug && !this._tracer.debug)) {
+    if (!this._tracer.debug && keyValues.debug) {
       return
     }
 

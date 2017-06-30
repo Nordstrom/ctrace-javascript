@@ -127,11 +127,15 @@ describe('tracer', () => {
       tracer.init({ stream, debug: isTracerDebug })
       let span = tracer.startSpan('originating', { debug: isSpanDebug }, () => {})
       let ctx = { span:  span }
+
       tracer.debug(ctx, 'DebugEvent', { foo: 'bar' })
       tracer.info(ctx, 'InfoEvent', { foo: 'bar' })
       tracer.warn(ctx, 'WarnEvent', { foo: 'bar' })
       tracer.error(ctx, 'ErrorEvent', { foo: 'bar' })
-      let logs = ctx.span._fields.logs
+
+      span.finish()
+
+      let logs = stream.buf.length ? JSON.parse(stream.buf[0]).logs : []
       let debugEvent = _.omit(_.find(logs, (log) => {
         return log.level === 'debug'
       }), ['timestamp'])
@@ -144,6 +148,7 @@ describe('tracer', () => {
       let errorEvent = _.omit(_.find(logs, (log) => {
         return log.level === 'error'
       }), ['timestamp'])
+
       return {
         debug: debugEvent,
         info: infoEvent,
@@ -152,7 +157,15 @@ describe('tracer', () => {
       }
     }
 
-    it('does not output any logs when tracer.debug is false but span.debug is true', () => {
+    it('outputs log when span.debug is true and tracer.debug is true', () => {
+      let events = createEvents(true, true)
+      events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
+
+    it('does not output span when span.debug is true and tracer.debug is false', () => {
       let events = createEvents(false, true)
       events.debug.should.be.an.Object().and.be.empty()
       events.info.should.be.an.Object().and.be.empty()
@@ -160,40 +173,22 @@ describe('tracer', () => {
       events.error.should.be.an.Object().and.be.empty()
     })
 
-    it('defaults to debug false when tracer.debug is not set and does not log debug, info or warn events', () => {
-      // should still log error because span.debug is false
+    it('defaults to debug false when tracer.debug and span.debug are not set and does not log debug events', () => {
       let events = createEvents()
       events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.be.an.Object().and.be.empty()
-      events.warn.should.be.an.Object().and.be.empty()
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it('should only log error events when tracer.debug is true and span.debug is false', () => {
-      let events = createEvents(true)
-      events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.be.an.Object().and.be.empty()
-      events.warn.should.be.an.Object().and.be.empty()
-      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
-    })
-
-    it('should log all events when tracer.debug and span.debug are both true', () => {
-      let events = createEvents(true, true)
+    it('should log all events when tracer.debug is true and span.debug is false', () => {
+      let events = createEvents(true, false)
       events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
       events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
       events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
-
     })
 
-    it('should not log debug, info or warn events when tracer.debug is false', () => {
-      let events = createEvents(false)
-      events.debug.should.be.an.Object().and.be.empty()
-      events.info.should.be.an.Object().and.be.empty()
-      events.warn.should.be.an.Object().and.be.empty()
-      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
-
-    })
   })
 
   describe('with custom propagators', () => {
