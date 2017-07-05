@@ -189,6 +189,20 @@ describe('tracer', () => {
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
+    it.only('can update tracer.debug value on the fly', () => {
+      tracer.init({ debug: true })
+      let span = tracer.startSpan('originating', { debug: true }, () => {})
+      tracer.debug({ span: span }, 'Debug Log')
+      span.finish()
+
+      let logs = stream.buf.length ? JSON.parse(stream.buf[0]).logs : []
+      let debugEvent = _.omit(_.find(logs, (log) => {
+        return log.level === 'debug'
+      }), ['timestamp'])
+
+      debugEvent.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
+    })
+
   })
 
   describe('with custom propagators', () => {
