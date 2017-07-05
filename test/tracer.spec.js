@@ -189,18 +189,26 @@ describe('tracer', () => {
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it.only('can update tracer.debug value on the fly', () => {
-      tracer.init({ debug: true })
-      let span = tracer.startSpan('originating', { debug: true }, () => {})
-      tracer.debug({ span: span }, 'Debug Log')
-      span.finish()
-
-      let logs = stream.buf.length ? JSON.parse(stream.buf[0]).logs : []
-      let debugEvent = _.omit(_.find(logs, (log) => {
+    it('can update tracer.debug value on the fly', () => {
+      tracer.init({ debug: false })
+      let span1 = tracer.startSpan('originating', { debug: true }, () => {})
+      tracer.debug({ span: span1 }, 'Debug Log')
+      span1.finish()
+      let logs1 = span1._fields.logs
+      let debugEvent1 = _.omit(_.find(logs1, (log) => {
         return log.level === 'debug'
       }), ['timestamp'])
+      debugEvent1.should.be.an.Object().and.be.empty()
 
-      debugEvent.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
+      tracer.init({ debug: true })
+      let span2 = tracer.startSpan('originating', { debug: true }, () => {})
+      tracer.debug({ span: span2 }, 'Debug Log')
+      span2.finish()
+      let logs2 = span2._fields.logs
+      let debugEvent2 = _.omit(_.find(logs2, (log) => {
+        return log.level === 'debug'
+      }), ['timestamp'])
+      debugEvent2.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
     })
 
   })
