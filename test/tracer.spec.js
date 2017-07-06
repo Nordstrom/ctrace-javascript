@@ -189,7 +189,7 @@ describe('tracer', () => {
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it.only('can update tracer.debug value on the fly', () => {
+    it('can update tracer.debug value on the fly', () => {
       tracer.init({ debug: false, logFn: function(text) { console.log(text)} })
       let span1 = tracer.startSpan('originating', { debug: true }, () => {})
       tracer.debug({ span: span1 }, 'Debug Log')
