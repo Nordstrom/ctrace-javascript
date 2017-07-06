@@ -35,7 +35,7 @@ export default class Tracer {
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
-    this.debug = options.debug || process.env.ctrace_debug || false
+    this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
 
     if (!options.replacePropagators) {
