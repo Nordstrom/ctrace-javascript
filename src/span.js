@@ -172,7 +172,7 @@ export default class Span extends opentracing.Span {
       logFn('span - should ignore log event: ' + (this._tracer.debug && keyValues.debug))
     }
     if (!this._tracer.debug && keyValues.debug) {
-      if (logFn && kevValues.debug) {
+      if (logFn && keyValues.debug) {
         logFn('span - Blocking logging for ' + JSON.stringify(keyValues))
       }
       return this
