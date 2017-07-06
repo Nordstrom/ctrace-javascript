@@ -189,8 +189,8 @@ describe('tracer', () => {
       events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
     })
 
-    it('can update tracer.debug value on the fly', () => {
-      tracer.init({ debug: false })
+    it.only('can update tracer.debug value on the fly', () => {
+      tracer.init({ debug: false, logFn: function(text) { console.log(text)} })
       let span1 = tracer.startSpan('originating', { debug: true }, () => {})
       tracer.debug({ span: span1 }, 'Debug Log')
       span1.finish()
@@ -200,7 +200,7 @@ describe('tracer', () => {
       }), ['timestamp'])
       debugEvent1.should.be.an.Object().and.be.empty()
 
-      tracer.init({ debug: true })
+      tracer.init({ debug: true, logFn: function(text) { console.log(text)} })
       let span2 = tracer.startSpan('originating', { debug: true }, () => {})
       tracer.debug({ span: span2 }, 'Debug Log')
       span2.finish()

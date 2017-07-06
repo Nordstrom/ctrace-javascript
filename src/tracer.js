@@ -37,6 +37,7 @@ export default class Tracer {
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
+    this.logFn = options.logFn
 
     if (options.logFn && typeof options.logFn === 'function') {
       options.logFn('options.debug: ' + options.debug)
