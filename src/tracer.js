@@ -36,6 +36,8 @@ export default class Tracer {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || process.env.ctrace_debug || false
+    console.log('this.debug is set to ' + this.debug)
+    console.log('process.env.ctrace_debug = ' + process.env.ctrace_debug)
     this._propagation = {}
 
     if (!options.replacePropagators) {
