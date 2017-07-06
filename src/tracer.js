@@ -40,9 +40,7 @@ export default class Tracer {
     this.logFn = options.logFn
 
     if (this.logFn && typeof this.logFn === 'function') {
-      this.logFn('tracer options.debug: ' + options.debug)
-      this.logFn('tracer process.env.ctrace_debug: ' + process.env.ctrace_debug)
-      this.logFn('tracer this.debug: ' + this.debug)
+      this.logFn('tracer options.debug: ' + options.debug + ', tracer process.env.ctrace_debug: ' + process.env.ctrace_debug + ', tracer this.debug: ' + this.debug)
     }
 
     if (!options.replacePropagators) {
@@ -216,11 +214,10 @@ export default class Tracer {
   }
 
   report (fields) {
-    // if tracer.debug is false and span.debug is true, don't log this event
+    // if tracer.debug is false and span.debug is true, don't log this span
     let logFn = this.logFn
     if (logFn && typeof logFn === 'function') {
-      logFn('report this.debug: ' + this.debug)
-      logFn('report fields.debug: ' + fields.debug)
+      logFn('report this.debug: ' + this.debug + ', report fields.debug: ' + fields.debug)
     }
     if (!this.debug && fields.debug) {
       return
