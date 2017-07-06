@@ -168,8 +168,8 @@ export default class Span extends opentracing.Span {
   log (keyValues, timestamp) {
     let logFn = this._tracer.logFn
     if (logFn && typeof logFn === 'function') {
-      logFn('this._tracer.debug: ' + this._tracer.debug)
-      logFn('keyValues.debug: ' + keyValues.debug)
+      logFn('span this._tracer.debug: ' + this._tracer.debug)
+      logFn('span keyValues.debug: ' + keyValues.debug)
     }
     if (!this._tracer.debug && keyValues.debug) {
       return
