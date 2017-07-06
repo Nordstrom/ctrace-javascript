@@ -38,6 +38,12 @@ export default class Tracer {
     this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
 
+    if (options.logFn && typeof options.logFn === 'function') {
+      options.logFn('options.debug: ' + options.debug)
+      options.logFn('process.env.ctrace_debug: ' + process.env.ctrace_debug)
+      options.logFn('this.debug: ' + this.debug)
+    }
+
     if (!options.replacePropagators) {
       this._propagation[FORMAT_HTTP_HEADERS] = [new TextPropagator()]
       this._propagation[FORMAT_TEXT_MAP] = [new TextPropagator()]
