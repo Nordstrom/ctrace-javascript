@@ -169,7 +169,7 @@ export default class Span extends opentracing.Span {
     let logFn = (this._tracer.logFn && typeof this._tracer.logFn === 'function') ? this._tracer.logFn : undefined
     if (logFn && keyValues.debug) {
       logFn('span this._tracer.debug: ' + this._tracer.debug + ', span keyValues.debug: ' + keyValues.debug)
-      logFn('span - should ignore log event: ' + (this._tracer.debug && keyValues.debug))
+      logFn('span - should ignore log event: ' + (!this._tracer.debug && keyValues.debug))
     }
     if (!this._tracer.debug && keyValues.debug) {
       if (logFn && keyValues.debug) {
