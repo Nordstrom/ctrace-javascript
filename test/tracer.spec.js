@@ -190,7 +190,7 @@ describe('tracer', () => {
     })
 
     it('can update tracer.debug value on the fly', () => {
-      tracer.init({ debug: false, logFn: function(text) { console.log(text)} })
+      tracer.init({ debug: false })
       let span1 = tracer.startSpan('originating', { debug: true }, () => {})
       tracer.debug({ span: span1 }, 'Debug Log')
       span1.finish()
@@ -200,7 +200,7 @@ describe('tracer', () => {
       }), ['timestamp'])
       debugEvent1.should.be.an.Object().and.be.empty()
 
-      tracer.init({ debug: true, logFn: function(text) { console.log(text)} })
+      tracer.init({ debug: true })
       let span2 = tracer.startSpan('originating', { debug: true }, () => {})
       tracer.debug({ span: span2 }, 'Debug Log')
       span2.finish()

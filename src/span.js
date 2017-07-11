@@ -166,20 +166,8 @@ export default class Span extends opentracing.Span {
    * @return {Span} this
    */
   log (keyValues, timestamp) {
-    let logFn = (this._tracer.logFn && typeof this._tracer.logFn === 'function') ? this._tracer.logFn : undefined
-    if (logFn && keyValues.debug) {
-      logFn('span this._tracer.debug: ' + this._tracer.debug + ', span keyValues.debug: ' + keyValues.debug)
-      logFn('span - should ignore log event: ' + (!this._tracer.debug && keyValues.debug))
-    }
     if (!this._tracer.debug && keyValues.debug) {
-      if (logFn && keyValues.debug) {
-        logFn('span - Blocking logging for ' + JSON.stringify(keyValues))
-      }
       return this
-    } else {
-      if (logFn && keyValues.debug) {
-        logFn('span - not Blocking logging for ' + JSON.stringify(keyValues))
-      }
     }
     if (!timestamp) timestamp = keyValues.timestamp || Date.now()
     timestamp *= 1000
