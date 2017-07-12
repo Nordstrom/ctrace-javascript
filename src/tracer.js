@@ -31,6 +31,8 @@ export default class Tracer {
    * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode
    * @param {bool} [options.debug] - true for debug; otherwise, it is disabled
    * @param {object.<string, Propagators>} [options.propagators] - optional propagators
+   * @param {string} [options.serviceName] - allows the configuration of the "service" tag for the entire Tracer if not
+   *                                         specified here, can also be set using env variable "CTRACE_SERVICE_NAME"
    */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
@@ -50,6 +52,8 @@ export default class Tracer {
         this._propagation[key] = (list || []).concat(props[key])
       }
     }
+    // Can specify "service" tag for the entire Tracer using options or environment variable "CTRACE_SERVICE_NAME"
+    this.serviceName = options.serviceName || process.env.CTRACE_SERVICE_NAME
   }
 
   // ---------------------------------------------------------------------- //
@@ -125,6 +129,11 @@ export default class Tracer {
 
     if (options.tags) {
       f.tags = options.tags
+    }
+
+    if (this.serviceName) {
+      f.tags = f.tags || {}
+      f.tags["service"] = this.serviceName
     }
 
     if (baggage) {

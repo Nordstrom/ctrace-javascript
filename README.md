@@ -51,7 +51,8 @@ tracer.init({
         }
       }
     ]
-  }
+  },
+  serviceName: "ExampleService" // can set service name for entire tracer 
 })
 ```
 
