@@ -268,6 +268,8 @@ Construct a new tracer for internal use only.  Use [GlobalTracer#init](#globaltr
     -   `options.multiEvent` **bool?** true for multi-event mode; otherwise, single-event mode
     -   `options.debug` **bool?** true for debug; otherwise, it is disabled
     -   `options.propagators` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [Propagators](#propagators)>?** optional propagators
+    -   `options.serviceName` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** allows the configuration of the "service" tag for the entire Tracer if not
+                                                specified here, can also be set using env variable "ctrace_service_name"
 
 ### startSpan
 
