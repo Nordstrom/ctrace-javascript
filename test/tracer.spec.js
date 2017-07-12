@@ -152,10 +152,10 @@ describe('tracer', () => {
       const serviceName = "TestService"
       describe('from environment variable', function () {
         beforeEach(() => {
-          process.env.CTRACE_SERVICE_NAME = serviceName
+          process.env.ctrace_service_name = serviceName
           tracer.init({stream})
         })
-        afterEach(() => { delete process.env.CTRACE_SERVICE_NAME })
+        afterEach(() => { delete process.env.ctrace_service_name })
         it('tags should include service name', function () {
           let span = tracer.startSpan('originating')
           let fields = span._fields
