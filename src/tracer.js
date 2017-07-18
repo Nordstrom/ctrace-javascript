@@ -37,7 +37,7 @@ export default class Tracer {
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
-    this.debug = options.debug || false
+    this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
 
     if (!options.replacePropagators) {
@@ -87,7 +87,6 @@ export default class Tracer {
    */
   startSpan (name, options = {}) {
     const now = Date.now() * 1000
-
     let ref = (options.childOf && options.childOf._fields) || options.childOf
 
     const spanId = genId()
@@ -124,6 +123,7 @@ export default class Tracer {
       }
     }
 
+    f.debug = options.debug || false
     f.operation = name
     f.start = now
 
@@ -218,6 +218,10 @@ export default class Tracer {
   }
 
   report (fields) {
+    // if tracer.debug is false and span.debug is true, don't log this span
+    if (!this.debug && fields.debug) {
+      return
+    }
     return this._reporter.report(fields)
   }
 

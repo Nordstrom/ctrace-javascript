@@ -119,16 +119,23 @@ describe('tracer', () => {
         }
       })
     })
+  })
 
-    it('should log events by level', () => {
-      let ctx = { span: tracer.startSpan('originating', () => {}) }
+  describe('with debug settings', () => {
+
+    function createEvents (isTracerDebug, isSpanDebug) {
+      tracer.init({ stream, debug: isTracerDebug })
+      let span = tracer.startSpan('originating', { debug: isSpanDebug }, () => {})
+      let ctx = { span:  span }
 
       tracer.debug(ctx, 'DebugEvent', { foo: 'bar' })
       tracer.info(ctx, 'InfoEvent', { foo: 'bar' })
       tracer.warn(ctx, 'WarnEvent', { foo: 'bar' })
       tracer.error(ctx, 'ErrorEvent', { foo: 'bar' })
 
-      let logs = ctx.span._fields.logs
+      span.finish()
+
+      let logs = stream.buf.length ? JSON.parse(stream.buf[0]).logs : []
       let debugEvent = _.omit(_.find(logs, (log) => {
         return log.level === 'debug'
       }), ['timestamp'])
@@ -142,11 +149,66 @@ describe('tracer', () => {
         return log.level === 'error'
       }), ['timestamp'])
 
-      debugEvent.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
-      infoEvent.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
-      warnEvent.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
-      errorEvent.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+      return {
+        debug: debugEvent,
+        info: infoEvent,
+        warn: warnEvent,
+        error: errorEvent
+      }
+    }
 
+    it('outputs log when span.debug is true and tracer.debug is true', () => {
+      let events = createEvents(true, true)
+      events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
+
+    it('does not output span when span.debug is true and tracer.debug is false', () => {
+      let events = createEvents(false, true)
+      events.debug.should.be.an.Object().and.be.empty()
+      events.info.should.be.an.Object().and.be.empty()
+      events.warn.should.be.an.Object().and.be.empty()
+      events.error.should.be.an.Object().and.be.empty()
+    })
+
+    it('defaults to debug false when tracer.debug and span.debug are not set and does not log debug events', () => {
+      let events = createEvents()
+      events.debug.should.be.an.Object().and.be.empty()
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
+
+    it('should log all events when tracer.debug is true and span.debug is false', () => {
+      let events = createEvents(true, false)
+      events.debug.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
+      events.info.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      events.warn.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      events.error.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+    })
+
+    it('can update tracer.debug value on the fly', () => {
+      tracer.init({ debug: false })
+      let span1 = tracer.startSpan('originating', { debug: true }, () => {})
+      tracer.debug({ span: span1 }, 'Debug Log')
+      span1.finish()
+      let logs1 = span1._fields.logs
+      let debugEvent1 = _.omit(_.find(logs1, (log) => {
+        return log.level === 'debug'
+      }), ['timestamp'])
+      debugEvent1.should.be.an.Object().and.be.empty()
+
+      tracer.init({ debug: true })
+      let span2 = tracer.startSpan('originating', { debug: true }, () => {})
+      tracer.debug({ span: span2 }, 'Debug Log')
+      span2.finish()
+      let logs2 = span2._fields.logs
+      let debugEvent2 = _.omit(_.find(logs2, (log) => {
+        return log.level === 'debug'
+      }), ['timestamp'])
+      debugEvent2.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
     })
     describe('with service name', function () {
       const serviceName = "TestService"

@@ -15,6 +15,7 @@ export default class Span extends opentracing.Span {
    */
   constructor (tracer, fields) {
     super()
+    this.debug = fields.debug
     this._tracer = tracer
     this._fields = fields
   }
@@ -165,6 +166,9 @@ export default class Span extends opentracing.Span {
    * @return {Span} this
    */
   log (keyValues, timestamp) {
+    if (!this._tracer.debug && keyValues.debug) {
+      return this
+    }
     if (!timestamp) timestamp = keyValues.timestamp || Date.now()
     timestamp *= 1000
     keyValues.timestamp = timestamp
