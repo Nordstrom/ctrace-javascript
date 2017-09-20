@@ -8,7 +8,7 @@ const _global = {
 }
 
 function handleResponse (span, status, err, msg) {
-  if (err || status >= 300) {
+  if (err instanceof Error || status >= 400) {
     // Error detected.  Mark error, status code, and log error event
     span.setTag('error', true)
     if (status) span.setTag('http.status_code', status)
@@ -43,7 +43,7 @@ function sendWithPromise (span, request, options) {
     throw new Error(`${request} does not return a promise`)
   }
   return promise
-    .then((res) => {
+    .then((res = {}) => {
       handleResponse(span, res.statusCode, res.body, res.statusMessage)
       return res
     })

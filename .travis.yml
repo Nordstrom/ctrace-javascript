@@ -1,11 +1,20 @@
 language: node_js
 node_js:
-  - "7"
-  - "6"
-  - "4.3"
+- '6'
+- '7'
+- '8'
 script:
-  - npm run lint
-  - npm test  
+- npm run lint
+- npm test
 after_success:
-  - npm run coveralls
-  - npm run bench
+- npm run coveralls
+- npm run bench
+deploy:
+  skip_cleanup: true
+  provider: npm
+  email: $NPM_EMAIL
+  api_key: $NPM_TOKEN
+  on:
+    tags: true
+    repo: Nordstrom/ctrace-js
+    node: '6'

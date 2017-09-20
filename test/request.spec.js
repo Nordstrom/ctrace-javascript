@@ -15,6 +15,9 @@ function createServer () {
     req.on('end', () => {
       let path = urlParse(req.url).pathname
       let status = Number(path.split('?')[0].split('/')[1])
+      if (req.headers && req.headers['content-type'] === 'application/json'){
+        b = JSON.parse(b)
+      }
       switch (status) {
         case 301:
           res.writeHead(301, { Location: '/200' })
@@ -143,6 +146,14 @@ describe('request', () => {
       .catch(() => {
         let rec = JSON.parse(buf[0])
         rec.tags['error'].should.be.true()
+      })
+  })
+
+  it('should not mark error on 200', () => {
+    return tr({ method: 'PUT', uri: `${s.url}/200`, json: true, body: {data: 'test data'} })
+      .then(() => {
+        let rec = JSON.parse(buf[0])
+        rec.tags.should.not.have.property('error')
       })
   })
 
