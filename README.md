@@ -57,6 +57,11 @@ tracer.init({
       }
     ]
   },
+  stream: { // optional but defaults to stdout
+    write: (content) => { // Modify the anonymous function to write logs to an writable stream
+      console.log(content)
+    }
+  },
   serviceName: "ExampleService" // can set service name for entire tracer
 })
 ```
@@ -102,7 +107,7 @@ const express = require('express')
 const tracer = require('ctrace-js')
 const app = express()
 
-app.use(tracer.express)
+app.use(tracer.express())
 
 app.post('/users', (req, res) => {
   // ...
@@ -181,7 +186,7 @@ context into the HTTP Headers for this purpose as follows.
 
 ```js
 const headers = {}
-tracer.inject(span, Tracer.FORMAT_HTTP_HEADERS, headers)
+tracer.inject(span.context(), Tracer.FORMAT_HTTP_HEADERS, headers)
 ```
 
 ### Start Server Span
