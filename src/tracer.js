@@ -36,7 +36,7 @@ export default class Tracer {
    */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(new Encoder({
-      omitList: options.redactList || []
+      redactList: options.redactList || []
     }), options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || process.env.ctrace_debug === 'true' || false
