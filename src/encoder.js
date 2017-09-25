@@ -66,24 +66,9 @@ export default class Encoder {
     myURL.username = myURL.username === '' ? '' : redactMessage
     myURL.password = myURL.password === '' ? '' : redactMessage
     let query = querystring.parse(myURL.search.substring(1))
-
-    let newQuery = ''
-    let keys = Object.keys(query)
-    for (let i = 0; i < keys.length; i++) {
-      let name = keys[i]
-      if (newQuery.length === 0) {
-        newQuery = '?'
-      } else {
-        newQuery += '&'
-      }
-      if (this.findMatch(name)) {
-        newQuery += name + '=' + redactMessage
-      } else {
-        newQuery += name + '=' + query[name]
-      }
+    if(Object.keys(query).length) {
+      myURL.search = `?${querystring.stringify(this.clean(query))}`
     }
-
-    myURL.search = newQuery
 
     return myURL.toString()
   }
@@ -98,8 +83,7 @@ export default class Encoder {
   }
 
   findMatch (el) {
-    const redactList = this.redactList
-    return !!find(redactList, function (k) {
+    return !!find(this.redactList, function (k) {
       if (typeof (k) === 'string') {
         return el === k
       } else if (typeof (k) === 'object') {
