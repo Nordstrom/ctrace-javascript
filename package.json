@@ -8,13 +8,14 @@
     "fix": "standard --fix",
     "build": "babel src/ -d lib/ --no-babelrc --presets=env --plugins=add-module-exports",
     "clean": "rm -fr lib",
-    "prepublish": "yarn run build",
+    "prepublish": "npm run snyk-protect && yarn run build",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
     "coveralls": "nyc --reporter=text-lcov mocha | coveralls",
     "bench": "yarn run build && node ./bench.js",
     "docs": "documentation readme src/** --section API",
-    "start": "node ./demo.js"
+    "start": "node ./demo.js",
+    "snyk-protect": "snyk protect"
   },
   "author": "@andyday",
   "repository": "Nordstrom/ctrace-js",
@@ -70,6 +71,8 @@
     "json-redactor": "^0.6.0",
     "opentracing": "^0.13.0",
     "querystring": "^0.2.0",
-    "request-promise": "^4.2.1"
-  }
+    "request-promise": "^4.2.1",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
